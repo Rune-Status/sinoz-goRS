@@ -6,6 +6,7 @@ import (
 	"log"
 	"sync"
 	"github.com/sinoz/telos/internal/game_server/login"
+	"github.com/sinoz/telos/internal/game_server/message"
 )
 
 const (
@@ -111,11 +112,7 @@ connectionLoop:
 			in.ReadCString() // username
 			in.ReadCString() // password
 
-			response := NewPacket(3)
-			response.WriteInt8(login.LoginSuccess)
-			response.WriteInt8(0)
-			response.WriteInt8(0)
-			response.WriteAndFlush(client.writer)
+			client.downstream <- message.SuccesfulLogin{Rank: 2, Flagged: false}
 
 			stage = IngameStage
 
@@ -138,10 +135,19 @@ func (client *TcpClient) connectionTerminated() {
 
 func (client *TcpClient) Write() {
 	for {
-		for message := range client.downstream {
-			switch msg := message.(type) {
+		for downstreamMessage := range client.downstream {
+			switch msg := downstreamMessage.(type) {
+			case message.SuccesfulLogin:
+				response := NewPacket(3)
+
+				response.WriteInt8(login.LoginSuccess)
+				response.WriteInt8(int8(msg.Rank))
+				response.WriteBool(msg.Flagged)
+
+				response.WriteAndFlush(client.writer)
+
 			default:
-				log.Fatalf("Could not find implementation for message %v \n", msg)
+				log.Fatalf("Could not find implementation for downstreamMessage %v \n", msg)
 			}
 		}
 	}
