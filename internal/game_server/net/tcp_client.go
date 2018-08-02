@@ -112,7 +112,8 @@ connectionLoop:
 			in.ReadCString() // username
 			in.ReadCString() // password
 
-			client.downstream <- message.SuccesfulLogin{Rank: 2, Flagged: false}
+			client.Enqueue(message.SuccesfulLogin{Rank: 2, Flagged: false})
+			client.Enqueue(message.Details{ProcessId:1, Members:true})
 
 			stage = IngameStage
 
@@ -124,7 +125,7 @@ connectionLoop:
 
 func (client *TcpClient) sendLoginFailure(responseCode int) {
 	response := NewPacket(1)
-	response.WriteInt8(int8(responseCode))
+	response.WriteInt8(responseCode)
 	response.WriteAndFlush(client.writer)
 }
 
@@ -133,18 +134,44 @@ func (client *TcpClient) connectionTerminated() {
 	close(client.upstream)
 }
 
+func (client *TcpClient) Enqueue(msg DownstreamMessage) {
+	client.downstream <- msg
+}
+
 func (client *TcpClient) Write() {
 	for {
 		for downstreamMessage := range client.downstream {
 			switch msg := downstreamMessage.(type) {
 			case message.SuccesfulLogin:
-				response := NewPacket(3)
+				pkt := NewPacket(3)
 
-				response.WriteInt8(login.LoginSuccess)
-				response.WriteInt8(int8(msg.Rank))
-				response.WriteBool(msg.Flagged)
+				pkt.WriteInt8(login.LoginSuccess)
+				pkt.WriteInt8(msg.Rank)
+				pkt.WriteBool(msg.Flagged)
 
-				response.WriteAndFlush(client.writer)
+				pkt.WriteAndFlush(client.writer)
+
+			case message.Details:
+				pkt := NewPacket(4)
+				pkt.WriteInt8(249)
+				pkt.WriteBool(msg.Members)
+				pkt.WriteInt16(msg.ProcessId)
+				pkt.WriteAndFlush(client.writer)
+
+			case message.Logout:
+				pkt := NewPacket(1)
+				pkt.WriteInt8(109)
+				pkt.WriteAndFlush(client.writer)
+
+			case message.SkillUpdate:
+				pkt := NewPacket(7)
+
+				pkt.WriteInt8(134)
+				pkt.WriteInt8(msg.Id)
+				pkt.WriteInt32(int(msg.Experience))
+				pkt.WriteInt8(msg.Level)
+
+				pkt.WriteAndFlush(client.writer)
 
 			default:
 				log.Fatalf("Could not find implementation for downstreamMessage %v \n", msg)
