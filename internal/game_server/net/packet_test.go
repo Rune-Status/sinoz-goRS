@@ -90,3 +90,31 @@ func TestPacket_WriteInt64(t *testing.T) {
 		t.Errorf("read value of %v did not equal written value of %v", readValue, writtenValue)
 	}
 }
+
+func TestPacket_ByteBlock(t *testing.T) {
+	pkt := NewPacket(32)
+	pkt.ByteBlock(func() {
+		pkt.WriteInt8(0)
+		pkt.WriteInt16(1)
+		pkt.WriteInt32(2)
+	})
+
+	blockSize := pkt.ReadInt8()
+	if blockSize != 7 {
+		t.Errorf("block size of %v did not equal expected size of %v", blockSize, 7)
+	}
+}
+
+func TestPacket_ShortBlock(t *testing.T) {
+	pkt := NewPacket(32)
+	pkt.ShortBlock(func() {
+		pkt.WriteInt8(0)
+		pkt.WriteInt16(1)
+		pkt.WriteInt32(2)
+	})
+
+	blockSize := pkt.ReadInt16()
+	if blockSize != 7 {
+		t.Errorf("block size of %v did not equal expected size of %v", blockSize, 7)
+	}
+}

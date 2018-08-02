@@ -158,6 +158,29 @@ func (pkt *Packet) WriteCString(value string) {
 	pkt.WriteInt8(10)
 }
 
+func (pkt *Packet) ByteBlock(block func()) {
+	offset := pkt.writerIndex
+	pkt.WriteInt8(0)
+
+	block()
+
+	blockSize := (pkt.writerIndex - offset) - 1
+
+	pkt.payload[offset] = byte(blockSize)
+}
+
+func (pkt *Packet) ShortBlock(block func()) {
+	offset := pkt.writerIndex
+	pkt.WriteInt16(0)
+
+	block()
+
+	blockSize := (pkt.writerIndex - offset) - 2
+
+	pkt.payload[offset] = byte(blockSize >> 8)
+	pkt.payload[offset + 1] = byte(blockSize)
+}
+
 func (pkt *Packet) WriteAndFlush(writer *bufio.Writer) {
 	writer.Write(pkt.payload[:pkt.writerIndex])
 	writer.Flush()
