@@ -29,7 +29,7 @@ type TcpClient struct {
 type UpstreamMessage interface{}
 type DownstreamMessage interface{}
 
-type flush struct { }
+type flush struct{}
 
 func NewTcpClient(connnection net.Conn, upstreamPool, downstreamPool sync.Pool, login *login.Service) *TcpClient {
 	return &TcpClient{
@@ -117,14 +117,19 @@ connectionLoop:
 			in.ReadCString() // password
 
 			client.Enqueue(message.SuccesfulLogin{Rank: 2, Flagged: false})
-			client.Enqueue(message.Details{ProcessId:1, Members:true})
+			client.Enqueue(message.Details{ProcessId: 1, Members: true})
 
 			client.Flush()
 
 			stage = IngameStage
 
 		case IngameStage:
-			// TODO
+			if opcode == 3 {
+				in.Fill(client.reader, 1)
+				in.ReadBool()
+			} else {
+				log.Fatalf("Could not find decoder block for message %v", opcode)
+			}
 		}
 	}
 
