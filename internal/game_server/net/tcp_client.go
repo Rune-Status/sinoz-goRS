@@ -5,8 +5,8 @@ import (
 	"bufio"
 	"log"
 	"sync"
-	"github.com/sinoz/telos/internal/game_server/login"
-	"github.com/sinoz/telos/internal/game_server/message"
+	"github.com/sinoz/goRS/internal/game_server/login"
+	"github.com/sinoz/goRS/internal/game_server/message"
 )
 
 const (

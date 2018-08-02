@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"log"
 	"sync"
-	"github.com/sinoz/telos/internal/game_server/login"
+	"github.com/sinoz/goRS/internal/game_server/login"
 )
 
 type TcpServer struct {

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/sinoz/telos/internal/game_server/net"
-	"github.com/sinoz/telos/internal/game_server/login"
+	"github.com/sinoz/goRS/internal/game_server/net"
+	"github.com/sinoz/goRS/internal/game_server/login"
 )
 
 func main() {
