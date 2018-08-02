@@ -128,7 +128,7 @@ connectionLoop:
 				in.Fill(client.reader, 1)
 				in.ReadBool()
 			} else {
-				log.Fatalf("Could not find decoder block for message %v", opcode)
+				log.Printf("Could not find decoder block for message %v", opcode)
 			}
 		}
 	}
@@ -168,7 +168,7 @@ func (client *TcpClient) Write() {
 			out.WriteAndFlush(client.writer)
 
 		default:
-			log.Fatalf("Could not find implementation for downstream message %v \n", msg)
+			log.Printf("Could not find implementation for downstream message %v \n", msg)
 		}
 	}
 
