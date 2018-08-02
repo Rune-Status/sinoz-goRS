@@ -8,7 +8,7 @@ func TestPacket_WriteInt8(t *testing.T) {
 	writtenValue := 16
 
 	pkt := NewPacket(32)
-	pkt.WriteInt8(int8(writtenValue))
+	pkt.WriteInt8(writtenValue)
 
 	if int(pkt.ReadInt8()) != writtenValue {
 		t.Errorf("read value did not equal written value of %v", writtenValue)
@@ -30,7 +30,7 @@ func TestPacket_WriteInt16(t *testing.T) {
 	writtenValue := 524
 
 	pkt := NewPacket(32)
-	pkt.WriteInt16(int16(writtenValue))
+	pkt.WriteInt16(writtenValue)
 
 	readValue := int(pkt.ReadInt16())
 
@@ -43,7 +43,7 @@ func TestPacket_WriteInt24(t *testing.T) {
 	writtenValue := 3448484
 
 	pkt := NewPacket(32)
-	pkt.WriteInt24(int32(writtenValue))
+	pkt.WriteInt24(writtenValue)
 
 	readValue := int(pkt.ReadInt24())
 
@@ -56,7 +56,7 @@ func TestPacket_WriteInt32(t *testing.T) {
 	writtenValue := 1838383
 
 	pkt := NewPacket(32)
-	pkt.WriteInt32(int32(writtenValue))
+	pkt.WriteInt32(writtenValue)
 
 	readValue := int(pkt.ReadInt32())
 

@@ -99,7 +99,7 @@ func (pkt *Packet) Fill(reader *bufio.Reader, amount int) {
 	pkt.readerIndex = 0
 }
 
-func (pkt *Packet) WriteInt8(value int8) {
+func (pkt *Packet) WriteInt8(value int) {
 	pkt.payload[pkt.writerIndex] = byte(value)
 	pkt.writerIndex += 1
 }
@@ -112,47 +112,47 @@ func (pkt *Packet) WriteBool(value bool) {
 	}
 }
 
-func (pkt *Packet) WriteInt16(value int16) {
-	pkt.WriteInt8(int8(value >> 8))
-	pkt.WriteInt8(int8(value))
+func (pkt *Packet) WriteInt16(value int) {
+	pkt.WriteInt8(value >> 8)
+	pkt.WriteInt8(value)
 }
 
-func (pkt *Packet) WriteInt24(value int32) {
-	pkt.WriteInt8(int8(value >> 16))
-	pkt.WriteInt8(int8(value >> 8))
-	pkt.WriteInt8(int8(value))
+func (pkt *Packet) WriteInt24(value int) {
+	pkt.WriteInt8(value >> 16)
+	pkt.WriteInt8(value >> 8)
+	pkt.WriteInt8(value)
 }
 
-func (pkt *Packet) WriteInt32(value int32) {
-	pkt.WriteInt8(int8(value >> 24))
-	pkt.WriteInt8(int8(value >> 16))
-	pkt.WriteInt8(int8(value >> 8))
-	pkt.WriteInt8(int8(value))
+func (pkt *Packet) WriteInt32(value int) {
+	pkt.WriteInt8(value >> 24)
+	pkt.WriteInt8(value >> 16)
+	pkt.WriteInt8(value >> 8)
+	pkt.WriteInt8(value)
 }
 
 func (pkt *Packet) WriteInt48(value int) {
-	pkt.WriteInt8(int8(value >> 40))
-	pkt.WriteInt8(int8(value >> 32))
-	pkt.WriteInt8(int8(value >> 24))
-	pkt.WriteInt8(int8(value >> 16))
-	pkt.WriteInt8(int8(value >> 8))
-	pkt.WriteInt8(int8(value))
+	pkt.WriteInt8(value >> 40)
+	pkt.WriteInt8(value >> 32)
+	pkt.WriteInt8(value >> 24)
+	pkt.WriteInt8(value >> 16)
+	pkt.WriteInt8(value >> 8)
+	pkt.WriteInt8(value)
 }
 
 func (pkt *Packet) WriteInt64(value int64) {
-	pkt.WriteInt8(int8(value >> 56))
-	pkt.WriteInt8(int8(value >> 48))
-	pkt.WriteInt8(int8(value >> 40))
-	pkt.WriteInt8(int8(value >> 32))
-	pkt.WriteInt8(int8(value >> 24))
-	pkt.WriteInt8(int8(value >> 16))
-	pkt.WriteInt8(int8(value >> 8))
-	pkt.WriteInt8(int8(value))
+	pkt.WriteInt8(int(value >> 56))
+	pkt.WriteInt8(int(value >> 48))
+	pkt.WriteInt8(int(value >> 40))
+	pkt.WriteInt8(int(value >> 32))
+	pkt.WriteInt8(int(value >> 24))
+	pkt.WriteInt8(int(value >> 16))
+	pkt.WriteInt8(int(value >> 8))
+	pkt.WriteInt8(int(value))
 }
 
 func (pkt *Packet) WriteCString(value string) {
 	for i := 0; i < len(value); i++ {
-		pkt.WriteInt8(int8(value[i]))
+		pkt.WriteInt8(int(value[i]))
 	}
 
 	pkt.WriteInt8(10)
