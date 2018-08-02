@@ -48,11 +48,11 @@ func (client *TcpClient) Read() {
 
 	stage := HandshakeStage
 
-receiveData:
+connectionLoop:
 	for {
 		opcode, err := client.reader.ReadByte()
 		if err != nil {
-			break receiveData
+			break connectionLoop
 		}
 
 		switch stage {
@@ -74,10 +74,42 @@ receiveData:
 			}
 
 		case LoginStage:
-			in.Fill(client.reader, 10)
+			// wait for the size notation to come in
+			in.Fill(client.reader, 1)
+
+			// read the size and then wait for all of the remaining bytes to come in
+			payloadSize := in.ReadInt8()
+			in.Fill(client.reader, int(payloadSize))
+
+			// and then read the login payload
 
 			in.ReadInt8() // magic value
-			in.ReadInt16() // client revision
+			in.ReadInt16() // client version
+
+			in.ReadBool() // low mem version
+
+			archiveCRCs := make([]int, 9)
+			for i := 0; i < len(archiveCRCs); i++ {
+				archiveCRCs[i] = int(in.ReadInt32())
+			}
+
+			in.ReadInt8() // rsa block size
+
+			rsaBlockId := in.ReadInt8()
+			if rsaBlockId != 10 {
+				client.sendLoginFailure(login.LoginServerRejected)
+				break connectionLoop
+			}
+
+			seeds := make([]int, 4)
+			for i := 0; i < len(seeds); i++ {
+				seeds[i] = int(in.ReadInt32())
+			}
+
+			in.ReadInt32() // uid
+
+			in.ReadCString() // username
+			in.ReadCString() // password
 
 			response := NewPacket(3)
 			response.WriteInt8(login.LoginSuccess)
@@ -90,8 +122,13 @@ receiveData:
 		case IngameStage:
 			// TODO
 		}
-
 	}
+}
+
+func (client *TcpClient) sendLoginFailure(responseCode int) {
+	response := NewPacket(1)
+	response.WriteInt8(int8(responseCode))
+	response.WriteAndFlush(client.writer)
 }
 
 func (client *TcpClient) connectionTerminated() {

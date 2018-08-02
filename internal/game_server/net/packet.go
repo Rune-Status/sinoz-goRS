@@ -91,6 +91,12 @@ func (pkt *Packet) ReadCString() string {
 
 func (pkt *Packet) Fill(reader *bufio.Reader, amount int) {
 	reader.Read(pkt.payload[:amount])
+
+	if (pkt.writerIndex + amount) >= pkt.writerIndex {
+		pkt.writerIndex += amount
+	}
+
+	pkt.readerIndex = 0
 }
 
 func (pkt *Packet) WriteInt8(value int8) {
