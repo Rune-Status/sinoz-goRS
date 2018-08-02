@@ -99,7 +99,7 @@ connectionLoop:
 			in.ReadInt8() // rsa block size
 
 			rsaBlockId := in.ReadInt8()
-			if rsaBlockId != 9 {
+			if rsaBlockId != 10 {
 				client.Enqueue(message.FailedLogin{ResponseCode: login.LoginServerRejected})
 				client.Flush()
 
