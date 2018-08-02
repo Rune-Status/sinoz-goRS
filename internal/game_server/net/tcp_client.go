@@ -29,6 +29,8 @@ type TcpClient struct {
 type UpstreamMessage interface{}
 type DownstreamMessage interface{}
 
+type flush struct { }
+
 func NewTcpClient(connnection net.Conn, upstreamPool, downstreamPool sync.Pool, login *login.Service) *TcpClient {
 	return &TcpClient{
 		connection:     connnection,
@@ -84,7 +86,7 @@ connectionLoop:
 
 			// and then read the login payload
 
-			in.ReadInt8() // magic value
+			in.ReadInt8()  // magic value
 			in.ReadInt16() // client version
 
 			in.ReadBool() // low mem version
@@ -115,12 +117,17 @@ connectionLoop:
 			client.Enqueue(message.SuccesfulLogin{Rank: 2, Flagged: false})
 			client.Enqueue(message.Details{ProcessId:1, Members:true})
 
+			client.Flush()
+
 			stage = IngameStage
 
 		case IngameStage:
 			// TODO
 		}
 	}
+
+	// and put the upstream buffer back into its pool so it can be reused
+	client.upstreamPool.Put(in)
 }
 
 func (client *TcpClient) sendLoginFailure(responseCode int) {
@@ -139,47 +146,41 @@ func (client *TcpClient) Enqueue(msg DownstreamMessage) {
 }
 
 func (client *TcpClient) Write() {
-	for {
-		for downstreamMessage := range client.downstream {
-			switch msg := downstreamMessage.(type) {
-			case message.SuccesfulLogin:
-				pkt := NewPacket(3)
+	out := client.downstreamPool.Get().(*Packet)
 
-				pkt.WriteInt8(login.LoginSuccess)
-				pkt.WriteInt8(msg.Rank)
-				pkt.WriteBool(msg.Flagged)
+	for downstreamMessage := range client.downstream {
+		switch msg := downstreamMessage.(type) {
+		case message.SuccesfulLogin:
+			out.WriteInt8(login.LoginSuccess)
+			out.WriteInt8(msg.Rank)
+			out.WriteBool(msg.Flagged)
 
-				pkt.WriteAndFlush(client.writer)
+		case message.Details:
+			out.WriteInt8(249)
+			out.WriteBool(msg.Members)
+			out.WriteInt16(msg.ProcessId)
 
-			case message.Details:
-				pkt := NewPacket(4)
-				pkt.WriteInt8(249)
-				pkt.WriteBool(msg.Members)
-				pkt.WriteInt16(msg.ProcessId)
-				pkt.WriteAndFlush(client.writer)
+		case message.Logout:
+			out.WriteInt8(109)
 
-			case message.Logout:
-				pkt := NewPacket(1)
-				pkt.WriteInt8(109)
-				pkt.WriteAndFlush(client.writer)
+		case message.SkillUpdate:
+			out.WriteInt8(134)
+			out.WriteInt8(msg.Id)
+			out.WriteInt32(int(msg.Experience))
+			out.WriteInt8(msg.Level)
 
-			case message.SkillUpdate:
-				pkt := NewPacket(7)
+		case flush:
+			out.WriteAndFlush(client.writer)
 
-				pkt.WriteInt8(134)
-				pkt.WriteInt8(msg.Id)
-				pkt.WriteInt32(int(msg.Experience))
-				pkt.WriteInt8(msg.Level)
-
-				pkt.WriteAndFlush(client.writer)
-
-			default:
-				log.Fatalf("Could not find implementation for downstreamMessage %v \n", msg)
-			}
+		default:
+			log.Fatalf("Could not find implementation for downstream message %v \n", msg)
 		}
 	}
+
+	// and put the upstream buffer back into its pool so it can be reused
+	client.downstreamPool.Put(out)
 }
 
 func (client *TcpClient) Flush() {
-	// TODO
+	client.downstream <- flush{}
 }
