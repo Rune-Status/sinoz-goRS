@@ -99,8 +99,10 @@ connectionLoop:
 			in.ReadInt8() // rsa block size
 
 			rsaBlockId := in.ReadInt8()
-			if rsaBlockId != 10 {
-				client.sendLoginFailure(login.LoginServerRejected)
+			if rsaBlockId != 9 {
+				client.Enqueue(message.FailedLogin{ResponseCode: login.LoginServerRejected})
+				client.Flush()
+
 				break connectionLoop
 			}
 
@@ -130,21 +132,6 @@ connectionLoop:
 	client.upstreamPool.Put(in)
 }
 
-func (client *TcpClient) sendLoginFailure(responseCode int) {
-	response := NewPacket(1)
-	response.WriteInt8(responseCode)
-	response.WriteAndFlush(client.writer)
-}
-
-func (client *TcpClient) connectionTerminated() {
-	close(client.downstream)
-	close(client.upstream)
-}
-
-func (client *TcpClient) Enqueue(msg DownstreamMessage) {
-	client.downstream <- msg
-}
-
 func (client *TcpClient) Write() {
 	out := client.downstreamPool.Get().(*Packet)
 
@@ -154,6 +141,9 @@ func (client *TcpClient) Write() {
 			out.WriteInt8(login.LoginSuccess)
 			out.WriteInt8(msg.Rank)
 			out.WriteBool(msg.Flagged)
+
+		case message.FailedLogin:
+			out.WriteInt16(msg.ResponseCode)
 
 		case message.Details:
 			out.WriteInt8(249)
@@ -177,8 +167,17 @@ func (client *TcpClient) Write() {
 		}
 	}
 
-	// and put the upstream buffer back into its pool so it can be reused
+	// and put the downstream buffer back into its pool so it can be reused
 	client.downstreamPool.Put(out)
+}
+
+func (client *TcpClient) connectionTerminated() {
+	close(client.downstream)
+	close(client.upstream)
+}
+
+func (client *TcpClient) Enqueue(msg DownstreamMessage) {
+	client.downstream <- msg
 }
 
 func (client *TcpClient) Flush() {
