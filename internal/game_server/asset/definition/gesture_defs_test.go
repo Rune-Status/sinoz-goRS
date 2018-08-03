@@ -3,7 +3,7 @@ package definition
 import "testing"
 
 func TestLoadGestureDefsFromFile(t *testing.T) {
-	definitions, err := LoadGestureDefsFromFile("assets/definition/gestures.json")
+	definitions, err := LoadGestureDefsFromFile("assets/gestures.json")
 	if err != nil {
 		t.Error(err)
 		return

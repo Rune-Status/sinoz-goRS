@@ -3,7 +3,7 @@ package definition
 import "testing"
 
 func TestLoadNpcDefsFromFile(t *testing.T) {
-	definitions, err := LoadItemDefsFromFile("assets/definition/npcs.json")
+	definitions, err := LoadItemDefsFromFile("assets/npcs.json")
 	if err != nil {
 		t.Error(err)
 		return

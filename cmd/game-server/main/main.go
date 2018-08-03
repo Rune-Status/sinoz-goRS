@@ -31,32 +31,32 @@ func main() {
 }
 
 func loadAssets() (*game.Assets, error) {
-	items, err := definition.LoadItemDefsFromFile("assets/definition/items.json")
+	items, err := definition.LoadItemDefsFromFile("assets/items.json")
 	if err != nil {
 		return nil, err
 	}
 
-	npcs, err := definition.LoadNpcDefsFromFile("assets/definition/npcs.json")
+	npcs, err := definition.LoadNpcDefsFromFile("assets/npcs.json")
 	if err != nil {
 		return nil, err
 	}
 
-	objects, err := definition.LoadObjectDefsFromFile("assets/definition/objects.json")
+	objects, err := definition.LoadObjectDefsFromFile("assets/objects.json")
 	if err != nil {
 		return nil, err
 	}
 
-	inventories, err := definition.LoadInventoryDefsFromFile("assets/definition/inventories.json")
+	inventories, err := definition.LoadInventoryDefsFromFile("assets/inventories.json")
 	if err != nil {
 		return nil, err
 	}
 
-	gestures, err := definition.LoadGestureDefsFromFile("assets/definition/gestures.json")
+	gestures, err := definition.LoadGestureDefsFromFile("assets/gestures.json")
 	if err != nil {
 		return nil, err
 	}
 
-	bitVariables, err := definition.LoadBitVariableDefsFromFile("assets/definition/bit_variables.json")
+	bitVariables, err := definition.LoadBitVariableDefsFromFile("assets/bit_variables.json")
 	if err != nil {
 		return nil, err
 	}

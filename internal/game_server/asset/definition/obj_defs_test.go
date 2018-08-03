@@ -3,7 +3,7 @@ package definition
 import "testing"
 
 func TestLoadObjectDefsFromFile(t *testing.T) {
-	definitions, err := LoadObjectDefsFromFile("assets/definition/objects.json")
+	definitions, err := LoadObjectDefsFromFile("assets/objects.json")
 	if err != nil {
 		t.Error(err)
 		return

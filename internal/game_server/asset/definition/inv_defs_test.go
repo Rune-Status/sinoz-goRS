@@ -3,7 +3,7 @@ package definition
 import "testing"
 
 func TestLoadInventoryDefsFromFile(t *testing.T) {
-	definitions, err := LoadInventoryDefsFromFile("assets/definition/inventories.json")
+	definitions, err := LoadInventoryDefsFromFile("assets/inventories.json")
 	if err != nil {
 		t.Error(err)
 		return

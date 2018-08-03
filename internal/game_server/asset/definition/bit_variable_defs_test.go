@@ -3,7 +3,7 @@ package definition
 import "testing"
 
 func TestLoadBitVariableDefsFromFile(t *testing.T) {
-	definitions, err := LoadBitVariableDefsFromFile("assets/definition/bit_variables.json")
+	definitions, err := LoadBitVariableDefsFromFile("assets/bit_variables.json")
 	if err != nil {
 		t.Error(err)
 		return
