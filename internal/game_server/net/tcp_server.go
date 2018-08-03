@@ -11,13 +11,13 @@ import (
 type TcpServer struct {
 	Port         int
 	Listener     net.Listener
-	loginService *login.Service
+	LoginService *login.Service
 }
 
 func NewTcpServer(port int, login *login.Service) *TcpServer {
 	return &TcpServer{
 		Port:         port,
-		loginService: login,
+		LoginService: login,
 	}
 }
 
@@ -45,7 +45,7 @@ func (server *TcpServer) StartListening() {
 			continue
 		}
 
-		client := NewTcpClient(connection, upstreamPool, downstreamPool, server.loginService)
+		client := NewTcpClient(connection, upstreamPool, downstreamPool, server.LoginService)
 
 		go client.Read()
 		go client.Write()
