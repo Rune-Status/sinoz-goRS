@@ -1,9 +1,9 @@
 package game
 
 type Service struct {
-	// TODO
+	world *World
 }
 
 func NewService() *Service {
-	return &Service{}
+	return &Service{world: NewWorld()}
 }
