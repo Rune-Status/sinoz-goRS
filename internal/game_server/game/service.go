@@ -1,9 +1,13 @@
 package game
 
 type Service struct {
-	world *World
+	Assets Assets
+	World  *World
 }
 
-func NewService() *Service {
-	return &Service{world: NewWorld()}
+func NewService(assets Assets) *Service {
+	return &Service{
+		Assets: assets,
+		World: NewWorld(),
+	}
 }
