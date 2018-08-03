@@ -1,11 +1,25 @@
 # goRS
 A RuneScape server emulation written in Golang.
 
+## Supported Client
+Currently set to 317. Conversion to latest OSRS revision is in the works.
+
 ## Features
-- Login decoding
-- Login response encoding
-- Game message decoding
-- Game message encoding
+- I/O
+    - Asset loading
+      - Items
+      - Npcs
+      - Objects
+      - Inventories
+      - Gestures
+      - Bit variables (varbits)
+- Networking
+    - TCP
+    - Efficient and thread-safe buffer pooling
+    - Login decoding
+    - Login response encoding
+    - Game message decoding
+    - Game message encoding
 
 ## Media
 
