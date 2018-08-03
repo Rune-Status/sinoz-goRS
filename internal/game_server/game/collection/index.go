@@ -87,7 +87,7 @@ func (idx *Index) Get(slot int) (Element, error) {
 	return idx.elements[slot], nil
 }
 
-func (idx *Index) forEach(f func(Element)) {
+func (idx *Index) ForEach(f func(Element)) {
 	for i := idx.offset; i <= idx.limit; i++ {
 		element := idx.elements[i]
 		if element != nil {
