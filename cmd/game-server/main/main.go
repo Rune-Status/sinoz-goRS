@@ -34,10 +34,16 @@ func loadAssets() (*game.Assets, error) {
 		return nil, err
 	}
 
-	return &game.Assets{Items: items, Npcs: npcs}, nil
+	objects, err := definition.LoadObjectDefsFromFile("assets/definition/objects.json")
+	if err != nil {
+		return nil, err
+	}
+
+	return &game.Assets{Items: items, Npcs: npcs, Objects: objects}, nil
 }
 
 func logLoadedAssets(assets game.Assets) {
 	log.Printf("Loaded %v item definitions \n", len(assets.Items))
 	log.Printf("Loaded %v npc definitions \n", len(assets.Npcs))
+	log.Printf("Loaded %v object definitions \n", len(assets.Objects))
 }
