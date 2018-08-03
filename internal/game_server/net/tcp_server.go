@@ -21,7 +21,7 @@ func NewTcpServer(port int, login *login.Service) *TcpServer {
 	}
 }
 
-func (server *TcpServer) StartListening() {
+func (server *TcpServer) Start() {
 	listener, err := net.Listen("tcp", ":"+strconv.Itoa(server.Port))
 	if err != nil {
 		log.Fatal(err)
@@ -52,7 +52,7 @@ func (server *TcpServer) StartListening() {
 	}
 }
 
-func (server *TcpServer) StopListening() {
+func (server *TcpServer) Stop() {
 	if server.Listener != nil {
 		server.Listener.Close()
 	}

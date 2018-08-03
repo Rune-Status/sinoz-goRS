@@ -23,8 +23,11 @@ func main() {
 	gameService := game.NewService(*assets)
 	loginService := login.NewService(gameService)
 
+	loginService.Start()
+	gameService.Start()
+
 	tcpServer := net.NewTcpServer(GamePort, loginService)
-	tcpServer.StartListening()
+	tcpServer.Start()
 }
 
 func loadAssets() (*game.Assets, error) {

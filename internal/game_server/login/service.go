@@ -13,6 +13,14 @@ func NewService(gameService *game.Service) *Service {
 	return &Service{gameService: gameService}
 }
 
-func (s *Service) GenerateSessionKey() int64 {
+func (service *Service) Start() {
+	// TODO
+}
+
+func (service *Service) Stop() {
+	// TODO
+}
+
+func (service *Service) GenerateSessionKey() int64 {
 	return rand.Int63()
 }
