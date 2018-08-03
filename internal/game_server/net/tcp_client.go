@@ -6,7 +6,8 @@ import (
 	"log"
 	"sync"
 	"github.com/sinoz/goRS/internal/game_server/login"
-	"github.com/sinoz/goRS/internal/game_server/game/message"
+	loginMessages "github.com/sinoz/goRS/internal/game_server/login/message"
+	gameMessages "github.com/sinoz/goRS/internal/game_server/game/message"
 )
 
 const (
@@ -100,7 +101,7 @@ connectionLoop:
 
 			rsaBlockId := in.ReadInt8()
 			if rsaBlockId != 10 {
-				client.Enqueue(message.FailedLogin{ResponseCode: login.LoginServerRejected})
+				client.Enqueue(loginMessages.FailedLogin{ResponseCode: login.LoginServerRejected})
 				client.Flush()
 
 				break connectionLoop
@@ -116,8 +117,8 @@ connectionLoop:
 			in.ReadCString() // username
 			in.ReadCString() // password
 
-			client.Enqueue(message.SuccesfulLogin{Rank: 2, Flagged: false})
-			client.Enqueue(message.Details{ProcessId: 1, Members: true})
+			client.Enqueue(loginMessages.SuccesfulLogin{Rank: 2, Flagged: false})
+			client.Enqueue(gameMessages.Details{ProcessId: 1, Members: true})
 
 			client.Flush()
 
@@ -142,23 +143,23 @@ func (client *TcpClient) Write() {
 
 	for downstreamMessage := range client.downstream {
 		switch msg := downstreamMessage.(type) {
-		case message.SuccesfulLogin:
+		case loginMessages.SuccesfulLogin:
 			out.WriteInt8(login.LoginSuccess)
 			out.WriteInt8(msg.Rank)
 			out.WriteBool(msg.Flagged)
 
-		case message.FailedLogin:
+		case loginMessages.FailedLogin:
 			out.WriteInt16(msg.ResponseCode)
 
-		case message.Details:
+		case gameMessages.Details:
 			out.WriteInt8(249)
 			out.WriteBool(msg.Members)
 			out.WriteInt16(msg.ProcessId)
 
-		case message.Logout:
+		case gameMessages.Logout:
 			out.WriteInt8(109)
 
-		case message.SkillUpdate:
+		case gameMessages.SkillUpdate:
 			out.WriteInt8(134)
 			out.WriteInt8(msg.Id)
 			out.WriteInt32(int(msg.Experience))
