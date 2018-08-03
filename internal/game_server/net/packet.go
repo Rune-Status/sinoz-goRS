@@ -9,6 +9,7 @@ type Packet struct {
 	payload     []byte
 	readerIndex int
 	writerIndex int
+	bitIndex    int
 }
 
 func NewPacket(capacity int) *Packet {
@@ -179,6 +180,54 @@ func (pkt *Packet) ShortBlock(block func()) {
 
 	pkt.payload[offset] = byte(blockSize >> 8)
 	pkt.payload[offset + 1] = byte(blockSize)
+}
+
+func (pkt *Packet) BitAccess() {
+	pkt.bitIndex = pkt.writerIndex * 8
+}
+
+func (pkt *Packet) ByteAccess() {
+	pkt.writerIndex = (pkt.bitIndex + 7) / 8
+}
+
+func (pkt *Packet) WriteBit(value bool) {
+	if value {
+		pkt.WriteBits(1, 1)
+	} else {
+		pkt.WriteBits(1, 0)
+	}
+}
+
+func (pkt *Packet) WriteBits(amtBits, value int) {
+	bytePos := pkt.bitIndex / 8
+	bitOffset := 8 - (pkt.bitIndex & 7)
+
+	pkt.bitIndex += amtBits
+
+	for ; amtBits > bitOffset; bitOffset = 8 {
+		tmp := int(pkt.payload[bytePos])
+
+		tmp &= ^BitMasks[bitOffset]
+		tmp |= value >> uint(amtBits) - bitOffset & BitMasks[bitOffset]
+
+		bytePos += 1
+		pkt.payload[bytePos] = byte(tmp)
+
+		amtBits -= bitOffset
+	}
+
+	tmp := int(pkt.payload[bytePos])
+	if amtBits == bitOffset {
+		tmp &= ^BitMasks[bitOffset]
+		tmp |= value & BitMasks[bitOffset]
+
+		pkt.payload[bytePos] = byte(tmp)
+	} else {
+		tmp &= ^(BitMasks[amtBits] << uint(bitOffset) - amtBits)
+		tmp |= (value & BitMasks[amtBits]) << uint(bitOffset) - amtBits
+
+		pkt.payload[bytePos] = byte(tmp)
+	}
 }
 
 func (pkt *Packet) WriteAndFlush(writer *bufio.Writer) {
