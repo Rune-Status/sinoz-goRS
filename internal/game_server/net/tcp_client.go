@@ -6,7 +6,7 @@ import (
 	"log"
 	"sync"
 	"github.com/sinoz/goRS/internal/game_server/login"
-	"github.com/sinoz/goRS/internal/game_server/message"
+	"github.com/sinoz/goRS/internal/game_server/game/message"
 )
 
 const (
