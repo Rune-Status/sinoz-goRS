@@ -44,11 +44,17 @@ func loadAssets() (*game.Assets, error) {
 		return nil, err
 	}
 
+	gestures, err := definition.LoadGestureDefsFromFile("assets/definition/gestures.json")
+	if err != nil {
+		return nil, err
+	}
+
 	assets := &game.Assets{
 		Items: items,
 		Npcs: npcs,
 		Objects: objects,
 		Inventories: inventories,
+		Gestures: gestures,
 	}
 
 	return assets, nil
@@ -59,4 +65,5 @@ func logLoadedAssets(assets game.Assets) {
 	log.Printf("Loaded %v npc definitions \n", len(assets.Npcs))
 	log.Printf("Loaded %v object definitions \n", len(assets.Objects))
 	log.Printf("Loaded %v inventory definitions \n", len(assets.Inventories))
+	log.Printf("Loaded %v gesture definitions \n", len(assets.Gestures))
 }

@@ -7,4 +7,5 @@ type Assets struct {
 	Npcs        []definition.NpcDefinition
 	Objects     []definition.ObjectDefinition
 	Inventories []definition.InventoryDefinition
+	Gestures    []definition.GestureDefinition
 }
